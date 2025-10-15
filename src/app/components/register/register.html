@@ -1,0 +1,76 @@
+<div class="register-page">
+  <div class="register-card">
+    <h2 class="card-title">Új felhasználó</h2>
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+
+      <div class="form-group">
+        <label for="felhasznaloNev">Felhasználó név:</label>
+        <input id="felhasznaloNev" type="text" formControlName="userName" placeholder="Felhasználó név" class="form-input"/>
+      </div>
+
+
+      <div class="form-group">
+        <label for="role">Felhasználó típusa:</label>
+        <select id="role" formControlName="role" class="form-input">
+          <option value="" disabled>Válassz típust</option>
+          <option *ngFor="let role of userRoles | keyvalue" [value]="role.value">
+            {{ role.value | uppercase }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group password-group">
+        <label for="password">Jelszó:</label>
+        <div class="password-wrapper">
+          <input #passwordInput id="password" type="password" formControlName="passwordHash" placeholder="********" autocomplete="new-password" class="form-input"/>
+          <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+            <span *ngIf="!showPassword" class="eye-icon">👁️</span>
+            <span *ngIf="showPassword" class="eye-icon">🙈</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="validation-list" *ngIf="registerForm.get('passwordHash')?.touched || registerForm.get('passwordHash')?.dirty">
+        <div class="validation-item" [class.invalid]="registerForm.get('passwordHash')?.hasError('minlength')">
+          <span class="icon">{{ registerForm.get('passwordHash')?.hasError('minlength') ? '❌' : '✅' }}</span>
+          Legalább 8 karakter
+        </div>
+        <div class="validation-item" [class.invalid]="registerForm.get('passwordHash')?.hasError('uppercase')">
+          <span class="icon">{{ registerForm.get('passwordHash')?.hasError('uppercase') ? '❌' : '✅' }}</span>
+          Legalább egy nagybetű
+        </div>
+        <div class="validation-item" [class.invalid]="registerForm.get('passwordHash')?.hasError('lowercase')">
+          <span class="icon">{{ registerForm.get('passwordHash')?.hasError('lowercase') ? '❌' : '✅' }}</span>
+          Legalább egy kisbetű
+        </div>
+        <div class="validation-item" [class.invalid]="registerForm.get('passwordHash')?.hasError('number')">
+          <span class="icon">{{ registerForm.get('passwordHash')?.hasError('number') ? '❌' : '✅' }}</span>
+          Legalább egy szám
+        </div>
+        <div class="validation-item" [class.invalid]="registerForm.get('passwordHash')?.hasError('specialChar')">
+          <span class="icon">{{ registerForm.get('passwordHash')?.hasError('specialChar') ? '❌' : '✅' }}</span>
+          Legalább egy speciális karakter
+        </div>
+      </div>
+
+      <div class="form-group password-group">
+        <label for="password2">Jelszó újra:</label>
+        <div class="password-wrapper">
+          <input #password2Input id="password2" type="password" formControlName="passwordHash2" placeholder="********" autocomplete="new-password" class="form-input"/>
+          <button type="button" class="toggle-password" (click)="togglePassword2Visibility()">
+            <span *ngIf="!showPassword2" class="eye-icon">👁️</span>
+            <span *ngIf="showPassword2" class="eye-icon">🙈</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="registerForm.errors?.['passwordsMismatch'] && registerForm.get('jelszo2')?.touched">
+        A két jelszó nem egyezik
+      </div>
+
+      <button type="submit" [disabled]="registerForm.invalid" class="submit-btn">Regisztráció</button>
+
+    </form>
+  </div>
+</div>
