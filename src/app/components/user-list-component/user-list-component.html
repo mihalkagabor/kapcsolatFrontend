@@ -1,0 +1,62 @@
+<div class="register-page">
+  <div class="user-list-card">
+    <h2 class="card-title">Felhasználók listája</h2>
+
+    <div class="table-responsive" *ngIf="users && users.length > 0; else noUsers">
+      <table class="user-table">
+        <thead>
+        <tr>
+          <th>ID</th>
+          <th>Felhasználónév</th>
+          <th>Szerepkör</th>
+          <th>Műveletek</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.id }}</td>
+          <td>{{ user.userName }}</td>
+          <td>
+            <span *ngIf="!isEditing(user)">
+              {{ user.role }}
+            </span>
+            <select *ngIf="isEditing(user)" [(ngModel)]="modifiedRole">
+              <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+            </select>
+          </td>
+          <td class="muveletek">
+
+            <!-- Szerkesztés alatt -->
+            <ng-container *ngIf="isEditing(user); else normalButtons">
+              <button class="muvelet-btn success" (click)="saveEdit(user)">Mentés</button>
+              <button class="muvelet-btn secondary" (click)="cancelEdit()">Visszavon</button>
+            </ng-container>
+
+            <!-- Normál állapot -->
+            <ng-template #normalButtons>
+              <button
+                *ngIf="showButtons(user)"
+                class="muvelet-btn primary"
+                (click)="startEdit(user)">
+                Módosítás
+              </button>
+              <button
+                *ngIf="showButtons(user)"
+                class="muvelet-btn danger"
+                (click)="deleteUser(user)">
+                Törlés
+              </button>
+            </ng-template>
+
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Ha nincs egyetlen felhasználó sem -->
+    <ng-template #noUsers>
+      <p class="info-message">Jelenleg nincsenek felhasználók a rendszerben.</p>
+    </ng-template>
+  </div>
+</div>
