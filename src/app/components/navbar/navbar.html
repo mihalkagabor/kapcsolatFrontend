@@ -1,0 +1,34 @@
+<nav class="navbar">
+
+  <a routerLink="/main" class="muvelet-btn primary">Főoldal</a>
+
+  <ng-container *ngIf="authservie.hasRole('ADMIN')">
+    <div class="dropdown">
+      <button class="muvelet-btn admin" (click)="adminLenyiloMenu()">ADMIN</button>
+      <div class="dropdown-content" [class.show]="adminMenuPont">
+        <a routerLink="/register" (click)="adminLenyiloMenu()">Felhasználók létrehozása</a>
+        <a routerLink="/user_list" (click)="adminLenyiloMenu()">Felhasználók Listázása</a>
+      </div>
+    </div>
+  </ng-container>
+
+  <div class="dropdown">
+    <button class="muvelet-btn primary" (click)="autokLenyiloMenu()">Kapcsolattartók</button>
+    <div class="dropdown-content" [class.show]="autokMenuPont" >
+      <a routerLink="/contact_create" (click)="autokLenyiloMenu()">Kapcsolattartó létrehozása</a>
+      <a routerLink="/contact_list" (click)="autokLenyiloMenu()">Kapcsolattartó listázása</a>
+    </div>
+  </div>
+
+  <div class="dropdown">
+    <button class="muvelet-btn primary" (click)="profilLenyiloMenu()">Profil</button>
+    <div class="dropdown-content" [class.show]="profilMenuPont">
+      <a routerLink="/profile" (click)="profilLenyiloMenu()">Profil szerkesztése</a>
+    </div>
+  </div>
+
+  <ng-container *ngIf="authservie.isLoggedIn()">
+    <button (click)="logout()" class="muvelet-btn danger">Kijelentkezés</button>
+  </ng-container>
+
+</nav>
