@@ -1,0 +1,80 @@
+<div class="register-page">
+  <div class="register-card">
+    <h2 class="card-title">Új kapcsolattartó létrehozása</h2>
+
+    <form (ngSubmit)="registerContact()" class="register-form">
+
+      <!-- Fő adatok -->
+      <div class="form-group">
+        <label for="name">Név:</label>
+        <input id="name" type="text" [(ngModel)]="contact.name" name="name" placeholder="Név" required class="form-input"/>
+      </div>
+
+      <div class="form-group">
+        <label for="birthDate">Születési dátum:</label>
+        <input id="birthDate" type="date" [(ngModel)]="contact.birthDate" name="birthDate" required class="form-input"/>
+      </div>
+
+      <div class="form-group">
+        <label for="motherName">Anyja neve:</label>
+        <input id="motherName" type="text" [(ngModel)]="contact.motherName" name="motherName" placeholder="Anyja neve" required class="form-input"/>
+      </div>
+
+      <div class="form-group">
+        <label for="tajNumber">TAJ szám:</label>
+        <input id="tajNumber" type="text" [(ngModel)]="contact.tajNumber" name="tajNumber" placeholder="TAJ szám" required class="form-input"/>
+      </div>
+
+      <div class="form-group">
+        <label for="taxNumber">Adóazonosító:</label>
+        <input id="taxNumber" type="text" [(ngModel)]="contact.taxNumber" name="taxNumber" placeholder="Adóazonosító" required class="form-input"/>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email (nem kötelező, ha van telefonszám):</label>
+        <input id="email" type="email" [(ngModel)]="contact.email" name="email" placeholder="Email" class="form-input"/>
+      </div>
+
+      <!-- Címek -->
+      <div class="form-group">
+        <label>Címek:</label>
+        <div *ngFor="let addr of addresses; let i = index" class="address-group">
+          <input type="text" [(ngModel)]="addr.zipCode" name="zip{{i}}" placeholder="Irányítószám" required class="form-input"/>
+          <input type="text" [(ngModel)]="addr.city" name="city{{i}}" placeholder="Város" required class="form-input"/>
+          <input type="text" [(ngModel)]="addr.street" name="street{{i}}" placeholder="Utca" required class="form-input"/>
+          <input type="text" [(ngModel)]="addr.houseNumber" name="house{{i}}" placeholder="Házszám" required class="form-input"/>
+          <button type="button" (click)="removeAddress(i)" class="muvelet-btn danger">Cím törlése</button>
+        </div>
+        <button type="button" (click)="addAddress()" class="muvelet-btn secondary">+ Új cím</button>
+      </div>
+
+      <!-- Telefonszámok -->
+      <div class="form-group">
+        <label>Telefonszámok:</label>
+        <div *ngFor="let phone of phones; let i = index" class="phone-group">
+          <input type="text" [(ngModel)]="phone.phoneNumber" name="phone{{i}}" placeholder="Telefonszám" class="form-input"/>
+          <select [(ngModel)]="phone.type" name="type{{i}}" class="form-input">
+            <option value="">Típus</option>
+            <option value="mobile">Mobil</option>
+            <option value="home">Otthoni</option>
+            <option value="work">Munkahelyi</option>
+          </select>
+          <button type="button" (click)="removePhone(i)" class="muvelet-btn danger">Törlés</button>
+        </div>
+        <button type="button" (click)="addPhone()" class="muvelet-btn secondary">+ Új telefonszám</button>
+      </div>
+
+      <!-- Üzenetek -->
+      <div *ngIf="message" class="error-message">
+        <p [ngClass]="{
+          'text-red-600': message.includes('hiba') || message.includes('Adj'),
+          'text-green-600': message.includes('sikeresen')
+        }" class="whitespace-pre-line">
+          {{ message }}
+        </p>
+      </div>
+
+      <button type="submit" class="submit-btn">Mentés</button>
+    </form>
+  </div>
+</div>
