@@ -1,0 +1,34 @@
+
+
+<div class="login-page">
+  <div class="login-card">
+    <h2 class="card-title">Bejelentkezés</h2>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+
+      <div *ngIf="errorMessage" class="error-message">
+        <p>{{ errorMessage }}</p>
+      </div>
+
+      <div class="form-group">
+        <label for="identifier">Felhasználó név:</label>
+        <input id="identifier" type="text" formControlName="userName" placeholder="Felhasználó név" class="form-input"/>
+      </div>
+
+      <div class="form-group password-group">
+        <label for="password">Jelszó:</label>
+        <div class="password-wrapper">
+          <input #passwordInput id="password" type="password" formControlName="password" placeholder="********" class="form-input"/>
+          <button type="button" class="toggle-password" (click)="tooglePasswordVisibility()">
+            <span *ngIf="!showPassword" class="eye-icon">👁️</span>
+            <span *ngIf="showPassword" class="eye-icon">🙈️</span>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" [disabled]="loginForm.invalid" class="submit-btn">Bejelentkezés</button>
+
+    </form>
+  </div>
+</div>
+

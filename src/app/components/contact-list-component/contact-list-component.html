@@ -1,0 +1,206 @@
+<div class="register-page">
+  <div class="user-list-card">
+    <h2 class="card-title">Kapcsolat tartóim listája</h2>
+
+    <div *ngIf="loading" class="text-center py-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Betöltés...</span>
+      </div>
+      <p class="mt-2">A kontaktok betöltése...</p>
+    </div>
+    <div *ngIf="error" class="error-message py-2">{{ error }}</div>
+
+    <div class="muveletek" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <label>Oldalméret:
+        <select [(ngModel)]="pageSize" (change)="changePageSize()" class="form-control" style="width: auto; display: inline-block;">
+          <option *ngFor="let s of pageSizes" [value]="s">{{s}}</option>
+        </select>
+      </label>
+    </div>
+
+    <ng-container *ngIf="!loading && pagedContacts.length > 0">
+      <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+        <div *ngFor="let c of pagedContacts" class="contact-card card" style="flex: 1 1 450px; border: 1px solid #ccc; padding: 1.5rem; border-radius: 0.5rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+
+
+          <div class="contact-header" style="margin-bottom: 1rem; text-align: center;">
+            <strong style="font-size: 1.5rem; display: block; margin-bottom: 0.5rem;">{{ c.name }}</strong>
+            <div class="actions muveletek" style="display: flex; justify-content: center; gap: 0.5rem;">
+              <button *ngIf="editingContactId !== c.id" (click)="startEdit(c.id)" class="muvelet-btn primary">Szerkesztés</button>
+              <button *ngIf="editingContactId === c.id" (click)="saveContact(c.id)" class="muvelet-btn primary">Mentés</button>
+              <button *ngIf="editingContactId === c.id" (click)="cancelEdit()" class="muvelet-btn secondary">Mégse</button>
+              <button (click)="confirmAndDelete(c.id)" class="muvelet-btn danger">Törlés</button>
+            </div>
+          </div>
+
+
+          <div *ngIf="editingContactId !== c.id" class="contact-details table-responsive">
+
+            <h4 style="font-weight: 1000; text-align: center; margin-bottom: 0.5rem;font-size: 1.25rem">Fő adatok</h4>
+            <table class="user-table">
+              <thead>
+              <tr>
+                <th>Név</th>
+                <th>Születési dátum</th>
+                <th>Anya neve</th>
+                <th>TAJ-szám</th>
+                <th>Adószám</th>
+                <th>Email</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td>{{ c.name }}</td>
+                <td>{{ c.birthDate | date }}</td>
+                <td>{{ c.motherName }}</td>
+                <td>{{ c.tajNumber }}</td>
+                <td>{{ c.taxNumber }}</td>
+                <td>{{ c.email }}</td>
+              </tr>
+              </tbody>
+            </table>
+
+            <div *ngIf="getPhonesForContact(c.id).length > 0" class="section" style="margin-top: 1rem;">
+              <h4 style="font-weight: 1000; text-align: center; margin-bottom: 0.5rem;font-size: 1.25rem "> Telefonszámok</h4>
+              <table class="user-table">
+                <thead>
+                <tr>
+                  <th>Típus</th>
+                  <th>Szám</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let p of getPhonesForContact(c.id)">
+                  <td>{{ p.type }}</td>
+                  <td>{{ p.phoneNumber }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div *ngIf="getAddressesForContact(c.id).length > 0" class="section" style="margin-top: 1rem;">
+              <h4 style="font-weight: 1000; text-align: center; margin-bottom: 0.5rem;font-size: 1.25rem"> Címek</h4>
+              <table class="user-table">
+                <thead>
+                <tr>
+                  <th>Irányítószám</th>
+                  <th>Város</th>
+                  <th>Utca</th>
+                  <th>Házszám</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let a of getAddressesForContact(c.id)">
+                  <td>{{ a.zipCode }}</td>
+                  <td>{{ a.city }}</td>
+                  <td>{{ a.street }}</td>
+                  <td>{{ a.houseNumber }}</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+
+          <form *ngIf="editingContactId === c.id" [formGroup]="editForms[c.id]">
+
+            <div class="contact-details table-responsive">
+              <h4 style="font-weight: 1000; text-align: center; margin-bottom: 0.5rem;font-size: 1.25rem">Fő adatok szerkesztése</h4>
+              <table class="user-table">
+                <thead>
+                <tr>
+                  <th>Név</th>
+                  <th>Születési dátum</th>
+                  <th>Anya neve</th>
+                  <th>TAJ-szám</th>
+                  <th>Adószám</th>
+                  <th>Email</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td><input formControlName="name" [disabled]="true" class="form-control"/></td>
+                  <td><input formControlName="birthDate" type="date" class="form-control"/></td>
+                  <td><input formControlName="motherName" class="form-control"/></td>
+                  <td><input formControlName="tajNumber" class="form-control"/></td>
+                  <td><input formControlName="taxNumber" class="form-control"/></td>
+                  <td><input formControlName="email" type="email" class="form-control"/></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div formArrayName="phoneNumbers" class="section" style="margin-top: 1rem;">
+              <h4 style="font-weight: 1000; text-align: center; margin-bottom: 0.5rem;font-size: 1.25rem">Telefonszámok szerkesztése</h4>
+              <table class="user-table">
+                <thead>
+                <tr>
+                  <th>Típus</th>
+                  <th>Szám</th>
+                  <th style="width: 150px;"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let p of phoneArray(c.id).controls; let i=index" [formGroupName]="i">
+                  <td>
+                    <select formControlName="type" class="form-control">
+                      <option value="MOBILE">Mobil</option>
+                      <option value="HOME">Otthon</option>
+                      <option value="WORK">Munka</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input formControlName="phoneNumber" placeholder="+36..." class="form-control"/>
+                  </td>
+                  <td class="muveletek" style="text-align: right; white-space: nowrap;">
+                    <button type="button" (click)="savePhone(c.id, i)" class="muvelet-btn primary">Mentés</button>
+                    <button type="button" (click)="deletePhone(c.id, i)" class="muvelet-btn danger">Törlés</button>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+              <button type="button" (click)="addPhone(c.id)" class="muvelet-btn secondary" style="margin-top: 0.5rem;">+ Új telefonszám</button>
+            </div>
+
+            <div formArrayName="addresses" class="section" style="margin-top: 1rem;">
+              <h4 style="font-weight: 1000; text-align: center; margin-bottom: 0.5rem;font-size: 1.25rem"> Címek szerkesztése</h4>
+              <table class="user-table">
+                <thead>
+                <tr>
+                  <th>Irányítószám</th>
+                  <th>Város</th>
+                  <th>Utca</th>
+                  <th>Házszám</th>
+                  <th style="width: 150px;"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let a of addressArray(c.id).controls; let j=index" [formGroupName]="j">
+                  <td><input formControlName="zipCode" placeholder="Irányítószám" class="form-control"/></td>
+                  <td><input formControlName="city" placeholder="Város" class="form-control"/></td>
+                  <td><input formControlName="street" placeholder="Utca" class="form-control"/></td>
+                  <td><input formControlName="houseNumber" placeholder="Házszám" class="form-control"/></td>
+                  <td class="muveletek" style="text-align: right; white-space: nowrap;">
+                    <button type="button" (click)="saveAddress(c.id,j)" class="muvelet-btn primary">Mentés</button>
+                    <button type="button" (click)="deleteAddress(c.id,j)" class="muvelet-btn danger">Törlés</button>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+              <button type="button" (click)="addAddress(c.id)" class="muvelet-btn secondary" style="margin-top: 0.5rem;">+ Új cím</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </ng-container>
+
+    <div *ngIf="!loading && pagedContacts.length === 0" style="text-align: center; padding: 1rem 0;">
+      <p>Nincsenek kontaktok hozzáadva.</p>
+    </div>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 1rem;">
+      <button (click)="prevPage()" [disabled]="currentPage===1" class="muvelet-btn secondary">Előző</button>
+      <span>Oldal {{currentPage}} / {{totalPages}}</span>
+      <button (click)="nextPage()" [disabled]="currentPage===totalPages" class="muvelet-btn secondary">Következő</button>
+    </div>
+  </div>
+</div>
