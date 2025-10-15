@@ -1,0 +1,75 @@
+<div class="profile-page">
+  <div class="profile-card">
+    <h2 class="card-title">Felhasználó Profil</h2>
+
+    <div *ngIf="loading">Betöltés...</div>
+    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+    <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+
+      <div class="form-group">
+        <label for="userName">Felhasználónév</label>
+        <input id="userName" type="text" formControlName="userName" class="form-input" readonly />
+      </div>
+
+      <div *ngIf="editing">
+        <div class="form-group">
+          <label for="password">Új jelszó</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="passwordHash"
+            placeholder="********"
+            autocomplete="new-password"
+            class="form-input"
+          />
+        </div>
+
+        <div class="validation-list" *ngIf="profileForm.get('passwordHash')?.touched || profileForm.get('passwordHash')?.dirty">
+          <div class="validation-item" [class.invalid]="profileForm.get('passwordHash')?.hasError('minlength')">
+            Legalább 8 karakter
+          </div>
+          <div class="validation-item" [class.invalid]="profileForm.get('passwordHash')?.hasError('uppercase')">
+            Legalább egy nagybetű
+          </div>
+          <div class="validation-item" [class.invalid]="profileForm.get('passwordHash')?.hasError('lowercase')">
+            Legalább egy kisbetű
+          </div>
+          <div class="validation-item" [class.invalid]="profileForm.get('passwordHash')?.hasError('number')">
+            Legalább egy szám
+          </div>
+          <div class="validation-item" [class.invalid]="profileForm.get('passwordHash')?.hasError('specialChar')">
+            Legalább egy speciális karakter
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password2">Új jelszó újra</label>
+          <input
+            id="password2"
+            type="password"
+            formControlName="passwordHash2"
+            placeholder="********"
+            autocomplete="new-password"
+            class="form-input"
+          />
+        </div>
+
+        <div class="error-message" *ngIf="profileForm.errors?.['passwordsMismatch'] && profileForm.get('passwordHash2')?.touched">
+          A két jelszó nem egyezik.
+        </div>
+
+        <div class="button-row">
+          <button type="submit" [disabled]="profileForm.invalid" class="muvelet-btn success">Mentés</button>
+          <button type="button" class="muvelet-btn secondary" (click)="cancelEdit()">Mégse</button>
+        </div>
+      </div>
+
+      <div *ngIf="!editing" class="button-row">
+        <button type="button" class="muvelet-btn primary" (click)="enableEdit()">Jelszó módosítása</button>
+      </div>
+
+    </form>
+  </div>
+</div>
